@@ -19,12 +19,12 @@ type IUser interface {
 }
 
 type User struct {
-	service usecase.IUser
+	usecase usecase.IUser
 }
 
-func NewUser(s usecase.IUser) User {
+func NewUser(usecase usecase.IUser) User {
 	return User{
-		service: s,
+		usecase: usecase,
 	}
 }
 
@@ -51,9 +51,9 @@ func (u User) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	user, serviceErr := u.service.Create(dto.FromUserCreateToUser(dtoUser))
-	if serviceErr != nil {
-		apiErr := pkg.ToApiError(serviceErr)
+	user, usecaseErr := u.usecase.Create(dto.FromUserCreateToUser(dtoUser))
+	if usecaseErr != nil {
+		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
@@ -62,9 +62,9 @@ func (u User) CreateUser(ctx *gin.Context) {
 }
 
 func (u User) GetUsers(ctx *gin.Context) {
-	users, serviceErr := u.service.Search()
-	if serviceErr != nil {
-		apiErr := pkg.ToApiError(serviceErr)
+	users, usecaseErr := u.usecase.Search()
+	if usecaseErr != nil {
+		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
@@ -81,9 +81,9 @@ func (u User) GetUserByID(ctx *gin.Context) {
 		return
 	}
 
-	user, serviceErr := u.service.SearchByID(id)
-	if serviceErr != nil {
-		apiErr := pkg.ToApiError(serviceErr)
+	user, usecaseErr := u.usecase.SearchByID(id)
+	if usecaseErr != nil {
+		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
@@ -128,9 +128,9 @@ func (u User) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	user, serviceErr := u.service.Update(dto.FromUserUpdateToUser(dtoUser))
-	if serviceErr != nil {
-		apiErr := pkg.ToApiError(serviceErr)
+	user, usecaseErr := u.usecase.Update(dto.FromUserUpdateToUser(dtoUser))
+	if usecaseErr != nil {
+		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}

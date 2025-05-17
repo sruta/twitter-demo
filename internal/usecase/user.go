@@ -56,7 +56,7 @@ func (u User) Create(user domain.User) (domain.User, pkg.Error) {
 	}
 	user.Password = hashedPassword
 
-	return u.userRepository.Insert(nil, user)
+	return u.userRepository.Insert(user)
 }
 
 func (u User) Update(user domain.User) (domain.User, pkg.Error) {

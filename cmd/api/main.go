@@ -14,11 +14,11 @@ func initRouter(c *internal.Container) *gin.Engine {
 	api.POST("/login", c.AuthController.Login)     //OK
 
 	secure := api.Group("/").Use(middleware.Auth())
+
 	secure.GET("/user/:id", c.UserController.GetUserByID) //OK
 	secure.PUT("/user/:id", c.UserController.UpdateUser)  //OK
 
-	//secure.GET("/user/:id/followers", c.UserController.GetUserFollowers)
-	//secure.GET("/user/:id/follows", c.UserController.GetUserFollows)
+	secure.POST("/follower", c.FollowerController.CreateFollower) //OK
 
 	//secure.POST("/tweet", c.TweetController.PostTweet)
 	//secure.PUT("/tweet/:id", c.TweetController.UpdateTweet)

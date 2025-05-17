@@ -10,8 +10,9 @@ import (
 )
 
 type Container struct {
-	UserController controller.IUser
-	AuthController controller.IAuth
+	FollowerController controller.IFollower
+	UserController     controller.IUser
+	AuthController     controller.IAuth
 }
 
 func StartContainer() (*Container, error) {
@@ -24,14 +25,19 @@ func StartContainer() (*Container, error) {
 	pkg.InitializeJWT(config.JWTProd.Secret, config.JWTProd.Expiration)
 
 	userRepository := repository.NewUser(rdb)
-	userService := usecase.NewUser(rdb, userRepository)
-	userController := controller.NewUser(userService)
+	userUsecase := usecase.NewUser(rdb, userRepository)
+	userController := controller.NewUser(userUsecase)
+
+	followerRepository := repository.NewFollower(rdb)
+	followerUsecase := usecase.NewFollower(rdb, followerRepository, userRepository)
+	followerController := controller.NewFollower(followerUsecase)
 
 	authService := usecase.NewAuth(userRepository)
 	authController := controller.NewAuth(authService)
 
 	return &Container{
-		UserController: userController,
-		AuthController: authController,
+		FollowerController: followerController,
+		UserController:     userController,
+		AuthController:     authController,
 	}, nil
 }

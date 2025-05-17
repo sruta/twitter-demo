@@ -12,7 +12,7 @@ type IUser interface {
 	SelectByID(id int64) (domain.User, pkg.Error)
 	SelectByEmail(email string) (domain.User, pkg.Error)
 	SelectByUsername(username string) (domain.User, pkg.Error)
-	Insert(tx *sql.Tx, user domain.User) (domain.User, pkg.Error)
+	Insert(user domain.User) (domain.User, pkg.Error)
 	UpdateByID(user domain.User) (domain.User, pkg.Error)
 }
 
@@ -94,15 +94,9 @@ func (u User) SelectByUsername(username string) (domain.User, pkg.Error) {
 	return result, nil
 }
 
-func (u User) Insert(tx *sql.Tx, user domain.User) (domain.User, pkg.Error) {
-	var result sql.Result
-	var err error
+func (u User) Insert(user domain.User) (domain.User, pkg.Error) {
 	query := "insert into user(email, password, username) values (?,?, ?)"
-	if tx != nil {
-		result, err = tx.Exec(query, user.Email, user.Password, user.Username)
-	} else {
-		result, err = u.rdb.Exec(query, user.Email, user.Password, user.Username)
-	}
+	result, err := u.rdb.Exec(query, user.Email, user.Password, user.Username)
 	if err != nil {
 		return user, pkg.NewDBFatalError("insert user into", err)
 	}
