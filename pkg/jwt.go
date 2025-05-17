@@ -1,15 +1,13 @@
-package helpers
+package pkg
 
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"time"
-	"twitter-uala/internal/domain"
 )
 
 type Claims struct {
-	ID    int64  `json:"id"`
-	Email string `json:"email"`
+	ID int64 `json:"id"`
 	jwt.StandardClaims
 }
 
@@ -21,10 +19,9 @@ func InitializeJWT(secret string, expiration time.Duration) {
 	ExpirationTime = expiration
 }
 
-func GenerateJwtToken(user domain.User) (string, error) {
+func GenerateJwtToken(id int64) (string, error) {
 	claims := Claims{
-		ID:    user.ID,
-		Email: user.Email,
+		ID: id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(ExpirationTime).Unix(),
 		},

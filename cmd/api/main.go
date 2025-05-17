@@ -10,12 +10,13 @@ import (
 func initRouter(c *internal.Container) *gin.Engine {
 	r := gin.Default()
 	api := r.Group("/api/v1")
-	api.POST("/user", c.UserController.PostUser)
-	api.POST("/login", c.AuthController.PostLogin)
+	api.POST("/user", c.UserController.CreateUser) //OK
+	api.POST("/login", c.AuthController.Login)     //OK
 
 	secure := api.Group("/").Use(middleware.Auth())
-	//secure.PUT("/user/:id", c.UserController.UpdateUser)
-	secure.GET("/user/:id", c.UserController.GetUserByID)
+	secure.GET("/user/:id", c.UserController.GetUserByID) //OK
+	secure.PUT("/user/:id", c.UserController.UpdateUser)  //OK
+
 	//secure.GET("/user/:id/followers", c.UserController.GetUserFollowers)
 	//secure.GET("/user/:id/follows", c.UserController.GetUserFollows)
 

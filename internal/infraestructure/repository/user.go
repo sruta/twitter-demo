@@ -7,6 +7,15 @@ import (
 	"twitter-uala/pkg"
 )
 
+type IUser interface {
+	Select() ([]domain.User, pkg.Error)
+	SelectByID(id int64) (domain.User, pkg.Error)
+	SelectByEmail(email string) (domain.User, pkg.Error)
+	SelectByUsername(username string) (domain.User, pkg.Error)
+	Insert(tx *sql.Tx, user domain.User) (domain.User, pkg.Error)
+	UpdateByID(user domain.User) (domain.User, pkg.Error)
+}
+
 type User struct {
 	rdb *pkg.MySQL
 }
@@ -58,8 +67,8 @@ func (u User) SelectByID(id int64) (domain.User, pkg.Error) {
 func (u User) SelectByEmail(email string) (domain.User, pkg.Error) {
 	var result domain.User
 
-	row := u.rdb.QueryRow("select id, email, username from user where email = ?", email)
-	err := row.Scan(&result.ID, &result.Email, &result.Username)
+	row := u.rdb.QueryRow("select id, email, password, username from user where email = ?", email)
+	err := row.Scan(&result.ID, &result.Email, &result.Password, &result.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return result, pkg.NewDBNotFoundError("user", err)
@@ -70,11 +79,10 @@ func (u User) SelectByEmail(email string) (domain.User, pkg.Error) {
 	return result, nil
 }
 
-func (u User) SelectByEmailAndPassword(email string, password string) (domain.User, pkg.Error) {
+func (u User) SelectByUsername(username string) (domain.User, pkg.Error) {
 	var result domain.User
 
-	row := u.rdb.QueryRow("select id, email, username from user where email = ? and password = ?",
-		email, password)
+	row := u.rdb.QueryRow("select id, email, username from user where username = ?", username)
 	err := row.Scan(&result.ID, &result.Email, &result.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -104,6 +112,17 @@ func (u User) Insert(tx *sql.Tx, user domain.User) (domain.User, pkg.Error) {
 		return user, pkg.NewDBFatalError("insert user into", err)
 	}
 	user.Password = ""
+
+	return user, nil
+}
+
+func (u User) UpdateByID(user domain.User) (domain.User, pkg.Error) {
+	var err error
+	query := "update user set username = ? where id = ?"
+	_, err = u.rdb.Exec(query, user.Username, user.ID)
+	if err != nil {
+		return user, pkg.NewDBFatalError("update user in", err)
+	}
 
 	return user, nil
 }

@@ -2,11 +2,10 @@ package internal
 
 import (
 	"fmt"
-	"twitter-uala/internal/configs"
-	"twitter-uala/internal/controller"
-	"twitter-uala/internal/helpers"
-	"twitter-uala/internal/repository/mysql"
-	"twitter-uala/internal/service"
+	"twitter-uala/internal/config"
+	"twitter-uala/internal/infraestructure/repository"
+	"twitter-uala/internal/interface/controller"
+	"twitter-uala/internal/usecase"
 	"twitter-uala/pkg"
 )
 
@@ -16,20 +15,19 @@ type Container struct {
 }
 
 func StartContainer() (*Container, error) {
-	rdb, err := pkg.NewMySQL(configs.MySQLProd)
+	rdb, err := pkg.NewMySQL(config.MySQLProd)
 	if err != nil {
-		fmt.Printf("Error creating rdb with %v", configs.MySQLProd)
+		fmt.Printf("Error creating rdb with %v", config.MySQLProd)
 		return nil, err
 	}
 
-	helpers.InitializeJWT(configs.JWTProd.Secret, configs.JWTProd.Expiration)
+	pkg.InitializeJWT(config.JWTProd.Secret, config.JWTProd.Expiration)
 
 	userRepository := repository.NewUser(rdb)
-
-	userService := service.NewUser(rdb, userRepository)
+	userService := usecase.NewUser(rdb, userRepository)
 	userController := controller.NewUser(userService)
 
-	authService := service.NewAuth(userRepository)
+	authService := usecase.NewAuth(userRepository)
 	authController := controller.NewAuth(authService)
 
 	return &Container{

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
-	"twitter-uala/internal/configs"
+	"twitter-uala/internal/config"
 )
 
 type DB interface {
@@ -18,7 +18,7 @@ type MySQL struct {
 	*sql.DB
 }
 
-func NewMySQL(c configs.MySQL) (*MySQL, Error) {
+func NewMySQL(c config.MySQL) (*MySQL, Error) {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true", c.User, c.Pass, c.Host, c.Port, c.Database)
 
 	db, err := sql.Open(c.Driver, connectionString)

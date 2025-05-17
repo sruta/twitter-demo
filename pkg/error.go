@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -40,7 +41,8 @@ func NewDBNotFoundError(message string, original error) NotFoundError {
 }
 
 func IsNotFound(err error) bool {
-	typedError, ok := err.(isNotFound)
+	var typedError isNotFound
+	ok := errors.As(err, &typedError)
 	return ok && typedError.isNotFoundError()
 }
 
@@ -72,7 +74,8 @@ func NewForbiddenError(message string, original error) ForbiddenError {
 }
 
 func IsForbidden(err error) bool {
-	typedError, ok := err.(isForbidden)
+	var typedError isForbidden
+	ok := errors.As(err, &typedError)
 	return ok && typedError.isForbiddenError()
 }
 
@@ -108,7 +111,8 @@ func NewNotLoggedInUnauthorizedError(original error) UnauthorizedError {
 }
 
 func IsUnauthorized(err error) bool {
-	typedError, ok := err.(isUnauthorized)
+	var typedError isUnauthorized
+	ok := errors.As(err, &typedError)
 	return ok && typedError.isUnauthorizedError()
 }
 
@@ -148,7 +152,8 @@ func NewInvalidIDGenericError(original error) GenericError {
 }
 
 func IsGeneric(err error) bool {
-	typedError, ok := err.(isGeneric)
+	var typedError isGeneric
+	ok := errors.As(err, &typedError)
 	return ok && typedError.isGenericError()
 }
 
@@ -188,7 +193,8 @@ func NewDBScanFatalError(message string, original error) FatalError {
 }
 
 func IsFatal(err error) bool {
-	typedError, ok := err.(isFatal)
+	var typedError isFatal
+	ok := errors.As(err, &typedError)
 	return ok && typedError.isFatalError()
 }
 

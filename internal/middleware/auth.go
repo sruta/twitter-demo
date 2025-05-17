@@ -3,7 +3,6 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"strings"
-	"twitter-uala/internal/helpers"
 	"twitter-uala/pkg"
 )
 
@@ -19,7 +18,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := helpers.VerifyJwtToken(bearer[1])
+		claims, err := pkg.VerifyJwtToken(bearer[1])
 		if err != nil {
 			msg := "could not verify access token"
 			apiError := pkg.NewUnauthorizedApiError(pkg.NewUnauthorizedError(msg, err))
