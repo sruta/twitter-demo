@@ -18,13 +18,13 @@ type Follower struct {
 	usecase usecase.IFollower
 }
 
-func NewFollower(usecase usecase.IFollower) *Follower {
-	return &Follower{
+func NewFollower(usecase usecase.IFollower) Follower {
+	return Follower{
 		usecase: usecase,
 	}
 }
 
-func (f *Follower) CreateFollower(ctx *gin.Context) {
+func (f Follower) CreateFollower(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		apiErr := pkg.ToApiError(pkg.NewInvalidBodyGenericError(err))

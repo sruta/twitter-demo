@@ -14,13 +14,11 @@ type IUser interface {
 }
 
 type User struct {
-	rdb            pkg.DB
 	userRepository repository.IUser
 }
 
-func NewUser(rdb pkg.DB, userRepository repository.IUser) User {
+func NewUser(userRepository repository.IUser) User {
 	return User{
-		rdb:            rdb,
 		userRepository: userRepository,
 	}
 }

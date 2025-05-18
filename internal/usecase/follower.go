@@ -11,14 +11,12 @@ type IFollower interface {
 }
 
 type Follower struct {
-	rdb                pkg.DB
 	followerRepository repository.IFollower
 	userRepository     repository.IUser
 }
 
-func NewFollower(rdb pkg.DB, followerRepository repository.IFollower, userRepository repository.IUser) Follower {
+func NewFollower(followerRepository repository.IFollower, userRepository repository.IUser) Follower {
 	return Follower{
-		rdb:                rdb,
 		followerRepository: followerRepository,
 		userRepository:     userRepository,
 	}

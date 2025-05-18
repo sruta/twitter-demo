@@ -13,13 +13,11 @@ type ITweet interface {
 }
 
 type Tweet struct {
-	rdb             pkg.DB
 	tweetRepository repository.ITweet
 }
 
-func NewTweet(rdb pkg.DB, tweetRepository repository.ITweet) Tweet {
+func NewTweet(tweetRepository repository.ITweet) Tweet {
 	return Tweet{
-		rdb:             rdb,
 		tweetRepository: tweetRepository,
 	}
 }

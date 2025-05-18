@@ -35,7 +35,6 @@ func (u User) Select() ([]domain.User, pkg.Error) {
 	}
 
 	defer rows.Close()
-
 	for rows.Next() {
 		var user domain.User
 		err = rows.Scan(&user.ID, &user.Email)

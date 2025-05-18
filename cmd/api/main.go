@@ -24,7 +24,7 @@ func initRouter(c *internal.Container) *gin.Engine {
 	secure.GET("/tweet/:id", c.TweetController.GetTweetByID)
 	secure.PUT("/tweet/:id", c.TweetController.UpdateTweet)
 
-	//secure.GET("/timeline", c.TimelineController.GetTimeline)
+	secure.GET("/timeline", c.TimelineController.GetTimeline)
 
 	return r
 }

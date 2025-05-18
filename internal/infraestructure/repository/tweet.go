@@ -11,6 +11,7 @@ type ITweet interface {
 	SelectByID(id int64) (domain.Tweet, pkg.Error)
 	Insert(tweet domain.Tweet) (domain.Tweet, pkg.Error)
 	Update(tweet domain.Tweet) (domain.Tweet, pkg.Error)
+	SelectForTimeline(userID int64) ([]domain.Tweet, pkg.Error)
 }
 
 type Tweet struct {
@@ -62,4 +63,40 @@ func (t Tweet) Update(tweet domain.Tweet) (domain.Tweet, pkg.Error) {
 	}
 
 	return tweet, nil
+}
+
+func (t Tweet) SelectForTimeline(userID int64) ([]domain.Tweet, pkg.Error) {
+	result := []domain.Tweet{}
+
+	query := `
+	SELECT 
+		t.id, t.user_id, t.text, t.created_at, t.updated_at, u.id, u.email, u.username, u.created_at, u.updated_at
+	FROM tweet t 
+		INNER JOIN user u ON u.id = t.user_id
+		INNER JOIN follower f ON u.id = f.followed_id
+	WHERE
+		f.follower_id = ?
+	ORDER BY
+		t.created_at DESC
+    `
+	rows, err := t.rdb.Query(query, userID)
+	if err != nil {
+		return result, pkg.NewDBFatalError("get tweets from", err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var tweet domain.Tweet
+		var user domain.User
+
+		err = rows.Scan(&tweet.ID, &tweet.UserID, &tweet.Text, &tweet.CreatedAt, &tweet.UpdatedAt, &user.ID, &user.Email, &user.Username, &user.CreatedAt, &user.UpdatedAt)
+		if err != nil {
+			return result, pkg.NewDBScanFatalError("tweet", err)
+		}
+
+		tweet.User = &user
+		result = append(result, tweet)
+	}
+
+	return result, nil
 }

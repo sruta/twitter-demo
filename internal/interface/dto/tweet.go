@@ -17,11 +17,12 @@ type TweetUpdate struct {
 }
 
 type TweetResponse struct {
-	ID        int64     `json:"id"`
-	UserID    int64     `json:"user_id"`
-	Text      string    `json:"text"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int64         `json:"id"`
+	UserID    int64         `json:"user_id"`
+	Text      string        `json:"text"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+	User      *UserResponse `json:"user,omitempty"`
 }
 
 func FromTweetCreateToTweet(dto TweetCreate) domain.Tweet {
@@ -40,11 +41,26 @@ func FromTweetUpdateToTweet(dto TweetUpdate) domain.Tweet {
 }
 
 func FromTweetToTweetResponse(tweet domain.Tweet) TweetResponse {
+	var user *UserResponse
+	if tweet.User != nil {
+		userResponse := FromUserToUserResponse(*tweet.User)
+		user = &userResponse
+	}
+
 	return TweetResponse{
 		ID:        tweet.ID,
 		UserID:    tweet.UserID,
 		Text:      tweet.Text,
 		CreatedAt: tweet.CreatedAt,
 		UpdatedAt: tweet.UpdatedAt,
+		User:      user,
 	}
+}
+
+func FromTweetsToTweetsResponse(tweets []domain.Tweet) []TweetResponse {
+	response := []TweetResponse{}
+	for _, tweet := range tweets {
+		response = append(response, FromTweetToTweetResponse(tweet))
+	}
+	return response
 }
