@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"twitter-uala/internal/config"
 	"twitter-uala/internal/infraestructure/repository"
-	"twitter-uala/internal/interface/controller"
+	"twitter-uala/internal/interfaces/controller"
 	"twitter-uala/internal/usecase"
 	"twitter-uala/pkg"
 )

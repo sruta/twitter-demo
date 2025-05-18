@@ -6,28 +6,29 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"twitter-uala/internal/interface/dto"
+	"twitter-uala/internal/interfaces/dto"
 	"twitter-uala/internal/usecase"
 	"twitter-uala/pkg"
 )
 
-type ITweet interface {
-	CreateTweet(ctx *gin.Context)
-	GetTweetByID(ctx *gin.Context)
-	UpdateTweet(ctx *gin.Context)
+type IUser interface {
+	CreateUser(ctx *gin.Context)
+	GetUsers(ctx *gin.Context)
+	GetUserByID(ctx *gin.Context)
+	UpdateUser(ctx *gin.Context)
 }
 
-type Tweet struct {
-	usecase usecase.ITweet
+type User struct {
+	usecase usecase.IUser
 }
 
-func NewTweet(usecase usecase.ITweet) Tweet {
-	return Tweet{
+func NewUser(usecase usecase.IUser) User {
+	return User{
 		usecase: usecase,
 	}
 }
 
-func (t Tweet) CreateTweet(ctx *gin.Context) {
+func (u User) CreateUser(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		apiErr := pkg.ToApiError(pkg.NewInvalidBodyGenericError(err))
@@ -35,38 +36,43 @@ func (t Tweet) CreateTweet(ctx *gin.Context) {
 		return
 	}
 
-	var dtoTweet dto.TweetCreate
-	err = json.Unmarshal(body, &dtoTweet)
+	var dtoUser dto.UserCreate
+	err = json.Unmarshal(body, &dtoUser)
 	if err != nil {
 		apiErr := pkg.ToApiError(pkg.NewInvalidBodyGenericError(err))
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	validationErr := pkg.ValidateStruct(dtoTweet)
+	validationErr := pkg.ValidateStruct(dtoUser)
 	if validationErr != nil {
 		apiErr := pkg.ToApiError(validationErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	if dtoTweet.UserID != ctx.GetInt64("userID") {
-		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("user not authorized", nil))
-		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
-		return
-	}
-
-	tweet, usecaseErr := t.usecase.Create(dto.FromTweetCreateToTweet(dtoTweet))
+	user, usecaseErr := u.usecase.Create(dto.FromUserCreateToUser(dtoUser))
 	if usecaseErr != nil {
 		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, dto.FromTweetToTweetResponse(tweet))
+	ctx.JSON(http.StatusCreated, dto.FromUserToUserResponse(user))
 }
 
-func (t Tweet) GetTweetByID(ctx *gin.Context) {
+func (u User) GetUsers(ctx *gin.Context) {
+	users, usecaseErr := u.usecase.Search()
+	if usecaseErr != nil {
+		apiErr := pkg.ToApiError(usecaseErr)
+		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
+}
+
+func (u User) GetUserByID(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
@@ -75,17 +81,17 @@ func (t Tweet) GetTweetByID(ctx *gin.Context) {
 		return
 	}
 
-	tweet, usecaseErr := t.usecase.SearchByID(id)
+	user, usecaseErr := u.usecase.SearchByID(id)
 	if usecaseErr != nil {
 		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.FromTweetToTweetResponse(tweet))
+	ctx.JSON(http.StatusOK, dto.FromUserToUserResponse(user))
 }
 
-func (t Tweet) UpdateTweet(ctx *gin.Context) {
+func (u User) UpdateUser(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
@@ -101,39 +107,39 @@ func (t Tweet) UpdateTweet(ctx *gin.Context) {
 		return
 	}
 
-	var dtoTweet dto.TweetUpdate
-	err = json.Unmarshal(body, &dtoTweet)
+	var dtoUser dto.UserUpdate
+	err = json.Unmarshal(body, &dtoUser)
 	if err != nil {
 		apiErr := pkg.ToApiError(pkg.NewInvalidBodyGenericError(err))
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	validationErr := pkg.ValidateStruct(dtoTweet)
+	validationErr := pkg.ValidateStruct(dtoUser)
 	if validationErr != nil {
 		apiErr := pkg.ToApiError(validationErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	if id != dtoTweet.ID {
-		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("tweet id mismatch", nil))
+	if id != dtoUser.ID {
+		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("user id mismatch", nil))
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	if dtoTweet.UserID != ctx.GetInt64("userID") {
+	if id != ctx.GetInt64("userID") {
 		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("user not authorized", nil))
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	tweet, usecaseErr := t.usecase.Update(dto.FromTweetUpdateToTweet(dtoTweet))
+	user, usecaseErr := u.usecase.Update(dto.FromUserUpdateToUser(dtoUser))
 	if usecaseErr != nil {
 		apiErr := pkg.ToApiError(usecaseErr)
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.FromTweetToTweetResponse(tweet))
+	ctx.JSON(http.StatusOK, dto.FromUserToUserResponse(user))
 }
