@@ -11,8 +11,9 @@ type TweetCreate struct {
 }
 
 type TweetUpdate struct {
-	ID   int64  `json:"id" validate:"required"`
-	Text string `json:"text" validate:"required,min=1,max=280"`
+	ID     int64  `json:"id" validate:"required"`
+	UserID int64  `json:"user_id" validate:"required"`
+	Text   string `json:"text" validate:"required,min=1,max=280"`
 }
 
 type TweetResponse struct {
@@ -32,8 +33,9 @@ func FromTweetCreateToTweet(dto TweetCreate) domain.Tweet {
 
 func FromTweetUpdateToTweet(dto TweetUpdate) domain.Tweet {
 	return domain.Tweet{
-		ID:   dto.ID,
-		Text: dto.Text,
+		ID:     dto.ID,
+		UserID: dto.UserID,
+		Text:   dto.Text,
 	}
 }
 

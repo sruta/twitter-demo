@@ -52,8 +52,8 @@ func (u User) Select() ([]domain.User, pkg.Error) {
 func (u User) SelectByID(id int64) (domain.User, pkg.Error) {
 	var result domain.User
 
-	row := u.rdb.QueryRow("select id, email, username from user where id = ?", id)
-	err := row.Scan(&result.ID, &result.Email, &result.Username)
+	row := u.rdb.QueryRow("select id, email, username, created_at, updated_at from user where id = ?", id)
+	err := row.Scan(&result.ID, &result.Email, &result.Username, &result.CreatedAt, &result.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return result, pkg.NewDBNotFoundError("user", err)
@@ -67,8 +67,8 @@ func (u User) SelectByID(id int64) (domain.User, pkg.Error) {
 func (u User) SelectByEmail(email string) (domain.User, pkg.Error) {
 	var result domain.User
 
-	row := u.rdb.QueryRow("select id, email, password, username from user where email = ?", email)
-	err := row.Scan(&result.ID, &result.Email, &result.Password, &result.Username)
+	row := u.rdb.QueryRow("select id, email, password, username, created_at, updated_at from user where email = ?", email)
+	err := row.Scan(&result.ID, &result.Email, &result.Password, &result.Username, &result.CreatedAt, &result.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return result, pkg.NewDBNotFoundError("user", err)
@@ -82,8 +82,8 @@ func (u User) SelectByEmail(email string) (domain.User, pkg.Error) {
 func (u User) SelectByUsername(username string) (domain.User, pkg.Error) {
 	var result domain.User
 
-	row := u.rdb.QueryRow("select id, email, username from user where username = ?", username)
-	err := row.Scan(&result.ID, &result.Email, &result.Username)
+	row := u.rdb.QueryRow("select id, email, username, created_at, updated_at from user where username = ?", username)
+	err := row.Scan(&result.ID, &result.Email, &result.Username, &result.CreatedAt, &result.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return result, pkg.NewDBNotFoundError("user", err)
@@ -95,7 +95,7 @@ func (u User) SelectByUsername(username string) (domain.User, pkg.Error) {
 }
 
 func (u User) Insert(user domain.User) (domain.User, pkg.Error) {
-	query := "insert into user(email, password, username) values (?,?, ?)"
+	query := "insert into user(email, password, username, created_at, updated_at) values (?,?, ?, now(), now())"
 	result, err := u.rdb.Exec(query, user.Email, user.Password, user.Username)
 	if err != nil {
 		return user, pkg.NewDBFatalError("insert user into", err)
@@ -112,7 +112,7 @@ func (u User) Insert(user domain.User) (domain.User, pkg.Error) {
 
 func (u User) Update(user domain.User) (domain.User, pkg.Error) {
 	var err error
-	query := "update user set username = ? where id = ?"
+	query := "update user set username = ?, updated_at = now() where id = ?"
 	_, err = u.rdb.Exec(query, user.Username, user.ID)
 	if err != nil {
 		return user, pkg.NewDBFatalError("update user in", err)

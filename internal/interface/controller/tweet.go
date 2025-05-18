@@ -122,6 +122,12 @@ func (t Tweet) UpdateTweet(ctx *gin.Context) {
 		return
 	}
 
+	if dtoTweet.UserID != ctx.GetInt64("userID") {
+		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("user not authorized", nil))
+		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
+		return
+	}
+
 	tweet, usecaseErr := t.usecase.Update(dto.FromTweetUpdateToTweet(dtoTweet))
 	if usecaseErr != nil {
 		apiErr := pkg.ToApiError(usecaseErr)

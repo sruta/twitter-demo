@@ -56,7 +56,12 @@ func (u User) Create(user domain.User) (domain.User, pkg.Error) {
 	}
 	user.Password = hashedPassword
 
-	return u.userRepository.Insert(user)
+	user, err = u.userRepository.Insert(user)
+	if err != nil {
+		return user, err
+	}
+
+	return u.userRepository.SelectByID(user.ID)
 }
 
 func (u User) Update(user domain.User) (domain.User, pkg.Error) {
@@ -75,5 +80,10 @@ func (u User) Update(user domain.User) (domain.User, pkg.Error) {
 
 	dbUser.Username = user.Username
 
-	return u.userRepository.Update(dbUser)
+	dbUser, err = u.userRepository.Update(dbUser)
+	if err != nil {
+		return user, err
+	}
+
+	return u.userRepository.SelectByID(dbUser.ID)
 }

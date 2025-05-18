@@ -1,6 +1,9 @@
 package dto
 
-import "twitter-uala/internal/domain"
+import (
+	"time"
+	"twitter-uala/internal/domain"
+)
 
 type UserCreate struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -14,9 +17,11 @@ type UserUpdate struct {
 }
 
 type UserResponse struct {
-	ID       int64  `json:"id"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
+	ID        int64     `json:"id"`
+	Email     string    `json:"email"`
+	Username  string    `json:"username"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func FromUserCreateToUser(dto UserCreate) domain.User {
@@ -36,8 +41,10 @@ func FromUserUpdateToUser(dto UserUpdate) domain.User {
 
 func FromUserToUserResponse(user domain.User) UserResponse {
 	return UserResponse{
-		ID:       user.ID,
-		Email:    user.Email,
-		Username: user.Username,
+		ID:        user.ID,
+		Email:     user.Email,
+		Username:  user.Username,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
 }

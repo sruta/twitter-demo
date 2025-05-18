@@ -39,6 +39,10 @@ func (t Tweet) Update(tweet domain.Tweet) (domain.Tweet, pkg.Error) {
 		return tweet, err
 	}
 
+	if dbTweet.UserID != tweet.UserID {
+		return tweet, pkg.NewForbiddenError("user not authorized", nil)
+	}
+
 	dbTweet.Text = tweet.Text
 
 	dbTweet, err = t.tweetRepository.Update(dbTweet)

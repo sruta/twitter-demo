@@ -122,7 +122,13 @@ func (u User) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	if id != ctx.GetInt64("userID") || id != dtoUser.ID {
+	if id != dtoUser.ID {
+		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("user id mismatch", nil))
+		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
+		return
+	}
+
+	if id != ctx.GetInt64("userID") {
 		apiErr := pkg.NewForbiddenApiError(pkg.NewForbiddenError("user not authorized", nil))
 		ctx.JSON(apiErr.GetStatus(), apiErr.GetResponse())
 		return
