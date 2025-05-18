@@ -10,6 +10,7 @@ import (
 )
 
 type Container struct {
+	TweetController    controller.ITweet
 	FollowerController controller.IFollower
 	UserController     controller.IUser
 	AuthController     controller.IAuth
@@ -24,6 +25,10 @@ func StartContainer() (*Container, error) {
 
 	pkg.InitializeJWT(config.JWTProd.Secret, config.JWTProd.Expiration)
 
+	tweetRepository := repository.NewTweet(rdb)
+	tweetUsecase := usecase.NewTweet(rdb, tweetRepository)
+	tweetController := controller.NewTweet(tweetUsecase)
+
 	userRepository := repository.NewUser(rdb)
 	userUsecase := usecase.NewUser(rdb, userRepository)
 	userController := controller.NewUser(userUsecase)
@@ -36,6 +41,7 @@ func StartContainer() (*Container, error) {
 	authController := controller.NewAuth(authService)
 
 	return &Container{
+		TweetController:    tweetController,
 		FollowerController: followerController,
 		UserController:     userController,
 		AuthController:     authController,

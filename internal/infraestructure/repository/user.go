@@ -13,7 +13,7 @@ type IUser interface {
 	SelectByEmail(email string) (domain.User, pkg.Error)
 	SelectByUsername(username string) (domain.User, pkg.Error)
 	Insert(user domain.User) (domain.User, pkg.Error)
-	UpdateByID(user domain.User) (domain.User, pkg.Error)
+	Update(user domain.User) (domain.User, pkg.Error)
 }
 
 type User struct {
@@ -110,7 +110,7 @@ func (u User) Insert(user domain.User) (domain.User, pkg.Error) {
 	return user, nil
 }
 
-func (u User) UpdateByID(user domain.User) (domain.User, pkg.Error) {
+func (u User) Update(user domain.User) (domain.User, pkg.Error) {
 	var err error
 	query := "update user set username = ? where id = ?"
 	_, err = u.rdb.Exec(query, user.Username, user.ID)

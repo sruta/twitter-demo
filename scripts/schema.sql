@@ -17,4 +17,14 @@ CREATE TABLE follower
     PRIMARY KEY (follower_id, followed_id),
     CONSTRAINT follower_follower_id_fk FOREIGN KEY (follower_id) REFERENCES user (id) ON DELETE CASCADE,
     CONSTRAINT follower_followed_id_fk FOREIGN KEY (followed_id) REFERENCES user (id) ON DELETE CASCADE
-)
+);
+
+CREATE TABLE tweet
+(
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT          NOT NULL,
+    text       VARCHAR(280) NOT NULL,
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT tweet_user_id_fk FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+);

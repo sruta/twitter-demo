@@ -20,10 +20,9 @@ func initRouter(c *internal.Container) *gin.Engine {
 
 	secure.POST("/follower", c.FollowerController.CreateFollower) //OK
 
-	//secure.POST("/tweet", c.TweetController.PostTweet)
-	//secure.PUT("/tweet/:id", c.TweetController.UpdateTweet)
-	//secure.GET("/tweet/:id", c.TweetController.GetTweetByID)
-	//secure.GET("/tweet/user/:userID", c.TweetController.GetTweetsByUserID)
+	secure.POST("/tweet", c.TweetController.CreateTweet) //OK
+	secure.GET("/tweet/:id", c.TweetController.GetTweetByID)
+	secure.PUT("/tweet/:id", c.TweetController.UpdateTweet)
 
 	//secure.GET("/timeline", c.TimelineController.GetTimeline)
 

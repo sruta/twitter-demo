@@ -75,5 +75,5 @@ func (u User) Update(user domain.User) (domain.User, pkg.Error) {
 
 	dbUser.Username = user.Username
 
-	return u.userRepository.UpdateByID(dbUser)
+	return u.userRepository.Update(dbUser)
 }
