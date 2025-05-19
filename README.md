@@ -17,6 +17,7 @@ semejantes a [Twitter](https://x.com) (ahora X).
 ├── cmd
 │   └── api
 │       └── main.go     -> Punto de entrada. Configura el router y el contenedor.
+├── docs                -> Documentación del sistema
 ├── internal            -> Código privado de la aplicación
 │   ├── configs         -> Configuraciones de la aplicación
 │   ├── domain          -> Estructuras que definen las entidades del sistema
@@ -104,7 +105,53 @@ El test end-to-end realiza las siguientes solicitudes mientras va validando los 
 9. Creación de un follower del usuario A al usuario B
 10. Obtención de un timeline con un tweet para el usuario A
 
-### Uso
+### Modelo de datos
+
+![img.png](docs/data_model.png)
+
+### Arquitectura actual
+
+![img.png](docs/actual_architecture.png)
+
+### Arquitectura escalable
+
+Para poder soportar una mayor carga se debe poder escalar los distintos componentes del sistema de manera independiente
+según la necesidad. El siguiente enfoque separa el sistema según los distintos flujos de información:
+
+- Escrituras de tweets
+- Lecturas de timelines
+- Búsquedas de tweets/usuarios/tags
+
+![img.png](docs/scalable_architecture.png)
+
+#### Componentes
+
+- **Load Balancer**: distribuye la carga entre los distintos scopes según el tipo de operación sobre los datos
+- **CDN**: almacena las imágenes/videos para que se distribuya más rápido a los usuarios
+- **Write API Scope**: maneja las operaciones de escritura sobre los datos. Se encarga de recibir los tweets, likes,
+  followers, etc. Este scope tiene un sistema de colas para desacoplar la escritura de los tweets y la creación de los
+  timelines.
+- **Read API Scope**: maneja las operaciones de lectura sobre los datos. Se encarga de recibir las solicitudes de
+  timelines,
+  tweets, etc. Utiliza caches para mejorar la velocidad de respuesta.
+- **Search API Scope**: maneja las operaciones de búsqueda sobre los datos. Se encarga de recibir las solicitudes de
+  búsqueda
+  de tweets, usuarios, tags, etc. Utiliza un motor de búsqueda especial para mejorar la velocidad de respuesta.
+- **Media Store**: almacena los videos/imágenes de los tweets.
+- **Relational Database**: almacena los datos de los usuarios, tweets, followers, etc. Utiliza réplicas para mejorar la
+  velocidad de respuesta, los scopes de write interactúan con la instancia master y los scopes de read interactúan con
+  las instancias replica.
+- **Key-Value Store**: almacena los timelines de los usuarios y tweets. Es la primera opción de búsqueda para el scope
+  de read antes de ir a la base de datos relacional.
+- **Full Text Search Engine**: almacena de manera optimizada los tweets, usuarios y tags para su posterior búsqueda.
+- **Graph Database**: almacena las relaciones entre los usuarios (followers/followed).
+
+#### Quiero que soporte más lecturas! Asi no vamos a conseguir inversión de los VCs
+El diseño puede seguir iterándose para mejorar la escalabilidad, la velocidad de respuesta y separación de
+responsabilidades. Pueden existir scopes de read y write para cada una de las entidades del sistema (tweets, usuarios,
+timelines, search, media, etc.) de modo de poder escalar cada uno de ellos de manera independiente.
+
+### Uso de la API
 
 #### Endpoints sin autenticación
 
