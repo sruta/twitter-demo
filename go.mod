@@ -1,4 +1,4 @@
-module twitter-uala
+module twitter-demo
 
 go 1.24
 

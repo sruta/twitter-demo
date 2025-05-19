@@ -13,7 +13,7 @@ import (
 var baseURL = "http://localhost:8080/api/v1"
 
 // For this test to run, the server and the database must be running
-func TestUser(t *testing.T) {
+func TestFlowE2E(t *testing.T) {
 	run := time.Now().Unix()
 
 	primaryUser := map[string]string{

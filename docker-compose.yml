@@ -1,17 +1,16 @@
-version: '1'
-
 services:
   app:
     build: .
     depends_on:
       - db
+    command: sh -c "sleep 10 && ./main"
     environment:
       - PORT=8080
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USER=root
       - DB_PASSWORD=password
-      - DB_NAME=twitter_uala
+      - DB_NAME=twitter_demo
     ports:
       - "8080:8080"
 
@@ -20,7 +19,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: twitter_uala
+      MYSQL_DATABASE: twitter_demo
     ports:
       - "3306:3306"
     volumes:

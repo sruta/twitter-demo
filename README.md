@@ -1,419 +1,317 @@
-## About The Project
+## Acerca de este proyecto
 
-The goal of this project is to show how I would implement a real world system.
+El objetivo de este repositorio es mostrar como implementaría, a grandes rasgos, un sistema que tenga funcionalidades
+semejantes a [Twitter](https://x.com) (ahora X).
 
-The "SoccerManagerBELite" system is described [here](https://drive.google.com/file/d/1-xZjVGmqS1PlHyB9Z2WBvJxrUFpuii_f/view).
+### Construido con
 
-### Built With
+* [Go](https://go.dev/) como lenguaje de programación
+* [Gin-Gonic](https://github.com/gin-gonic/gin) para implementar la API REST
+* [MariaDB](https://mariadb.org/) para persistir los datos
+* [JWT](https://jwt.io/) para autenticar a los usuarios
 
-* [Go](https://go.dev/) Language
-* [Gin-Gonic](https://github.com/gin-gonic/gin) to run the REST API
-* [MariaDB](https://mariadb.org/) to persist the data
-* [JWT](https://jwt.io/) to authenticate users
-
-### Folder Structure
+### Estructura de carpetas
 
 ``` bash
 .
 ├── cmd
 │   └── api
-│       └── main.go   -> Entrypoint. Setups the router and container
-├── internal          -> Private application and library code
-│   ├── configs
-│   ├── controller    -> Functions to handle all things related to http communication
-│   ├── domain        -> Structs that define the system entities
-│   ├── helpers       -> Helper functions that need to be initialized by the application
-│   ├── middleware    -> Middlewares to be used with gin-gonic framework
-│   ├── repository    -> Functions to communicate with the persistance layer
-│   ├── service       -> Functions that handle the application logic
-│   ├── test          -> Application tests, not done :(
-│   └── container.go  -> Container definition used to inject dependencies
-├── pkg               -> Library code that can be used by external applications
-├── scripts           -> Database scripts
-├── go.mod            -> golang dependencies definition
-└── README.md
+│       └── main.go     -> Punto de entrada. Configura el router y el contenedor.
+├── internal            -> Código privado de la aplicación
+│   ├── configs         -> Configuraciones de la aplicación
+│   ├── domain          -> Estructuras que definen las entidades del sistema
+│   ├── helpers         -> Funciones auxiliares que necesitan ser inicializadas
+│   ├── infraestructure -> Código relacionado con la comunicación externa saliente
+│   │   └── repository  -> Implementación de los repositorios para persistencia de datos
+│   ├── interfaces      -> Código relacionado con la comunicación externa entrante
+│   │   ├── controller  -> Funciones para manejar comunicación HTTP
+│   │   └── dto         -> Objetos de transferencia de datos
+│   ├── middleware      -> Middlewares para el framework gin-gonic
+│   ├── usecase         -> Funciones que manejan la lógica de negocio
+│   ├── test            -> Pruebas de la aplicación
+│   └── container.go    -> Definición del contenedor para inyección de dependencias
+├── pkg                 -> Código de librería que puede ser usado por aplicaciones externas
+├── scripts             -> Scripts de base de datos
+├── go.mod              -> Definición de dependencias de golang
+└── README.md           -> Este archivo
 ```
 
-The system is coded to use dependency injection based in golang `interfaces`. This allows to unit test controllers,
-services and repositories easily because we can mock each one of their dependencies. Also allows to
-change, for example, the persistence technology without doing big changes in the codebase. 
+El sistema está diseñado para usar inyección de dependencias basada en `interfaces` de golang. Esto permite realizar
+pruebas unitarias fácilmente en los controladores, servicios y repositorios, ya que podemos simular cada una de sus
+dependencias. También permite cambiar, por ejemplo, la tecnología de persistencia sin realizar grandes cambios en el
+código.
 
+En este modelo, la autenticación se maneja mediante los `middlewares` de gin-gonic. Los `controllers` analizan las
+solicitudes HTTP, validando su cuerpo y parámetros, y también convierten errores de negocio en errores de API con el
+código de estado y formato correctos. Los `usecases` manejan la lógica de negocio y las validaciones, y orquestan el uso
+de las dependencias como clientes HTTP externos o clientes de persistencia. Finalmente, los `repositories` son los
+encargados de manejar la persistencia de los diferentes modelos del `domain`.
 
-In this model the authentication is handled by gin-gonic's `middlewares`. The `controllers` analyze the http requests and validate
-their body and parameters, also turn business errors into api errors that had the correct status
-code and format. The `services` handle business logic and validations and orchestrate the usage of the dependencies
-like external http clients or persistence clients. Finally, the `repositories` are the ones who handle the persistence 
-of the different `domain` models.
+### Instalación
 
-### Getting Started
-
-1. Clone the repo
+1. Clonar el repositorio
 
    ``` sh
-    git clone git@git.toptal.com:screening/Santiago-Ruta.git
+    git clone git@github.com:sruta/twitter-demo.git
    ```
-   
-2. Set database configurations to connect to a running MariaDB instance. The file is present at `internal/configs/mysql.go`.
-   
-    Default values are:
 
-      ``` golang
-       var MySQLProd = MySQL{
-           Host:         "localhost",
-           Database:     "soccer_manager",
-           User:         "root",
-           Pass:         "root",
-           Driver:       "mysql",
-           MaxOpenConns: 10,
-           MaxIdleConns: 10,
-       }
+2. Utilizar docker para iniciar la base de datos y el sistema
+
+    ``` sh
+    docker compose up -d --build
     ```
-   
-3. For the first use, run the scripts present at `scripts/`.
-4. For the first use, run the `go mod tidy` command to install the dependencies. `go1.18` must be installed in the 
-current machine to be able to run the system.
-5. Run `go mod cmd/api/main.go` to get the system up and running at `localhost:8080`.
 
-### Usage
+3. Para el primer uso conectarse a la base de datos con las credenciales presentes en `./docker-compose.yml` y crear el
+   schema `twitter_demo`
 
-#### Unauthenticated Endpoints
+4. Ejecutar el script presente en `./scripts/setup_db.sql` para crear las tablas necesarias
 
-* Create a new user:
+5. La aplicación ya se encuentra lista para utilizar en `http://localhost:8080`
+
+### Tests
+
+Se han implementado 3 tipos de tests a modo de ejemplo:
+
+1. Tests unitarios para `usecase/user.go`. Prueban los métodos mockeando la base de datos.
+
+    ``` sh
+    go test -v ./internal/usecase
     ```
-    POST /api/user
+
+2. Tests de integración para `controller/user.go`. Prueban los métodos utilizando la implementación real del usecase.
+
+    ``` sh
+    go test -v ./internal/interfaces/controller
     ```
-    Body:
-    ``` json
+
+3. Tests end-to-end para la API. Para ejecutarlo primero se debe iniciar la base de datos y la aplicación utilizando
+   docker compose.
+
+    ``` sh
+    go test -v ./test/e2e/
+    ```
+
+El test end-to-end realiza las siguientes solicitudes mientras va validando los resultados:
+
+1. Creación de un usuario A
+2. Creación de un usuario B
+3. Login del usuario A
+4. Login del usuario B
+5. Obtención del usuario A por ID
+6. Obtención del usuario B por ID
+7. Creación de un tweet para el usuario B
+8. Obtención de un timeline vacío para el usuario A
+9. Creación de un follower del usuario A al usuario B
+10. Obtención de un timeline con un tweet para el usuario A
+
+### Uso
+
+#### Endpoints sin autenticación
+
+* Crear un nuevo usuario:
+  ```
+  POST /api/v1/user
+  ```
+  Cuerpo:
+  ``` json
+  {
+    "email": "un_email@un_dominio.com",
+    "password": "12345",
+    "username": "un_nombre_de_usuario"
+  }
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "id": 1,
+    "email": "un_email@un_dominio.com",
+    "username": "un_nombre_de_usuario",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  }
+  ```
+
+* Login:
+  ```
+  POST /api/v1/login
+  ```
+  Cuerpo:
+  ``` json
+  {
+    "email": "un_email@un_dominio.com",
+    "password": "12345"
+  }
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "token": "un_token_JWT"
+  }
+  ```
+
+#### Endpoints con autenticación
+
+El header `Authorization: Bearer {token_recibido_en_el_login}` debe ser enviado en las solicitudes para poder acceder
+a los siguientes recursos.
+
+* Obtener un usuario por ID:
+  ```
+  GET /api/v1/user/:id
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "id": 1,
+    "email": "un_email@un_dominio.com",
+    "username": "un_nombre_de_usuario",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  }
+  ```
+
+* Modificar un usuario por ID:
+  ```
+  PUT /api/user/:id
+  ```
+  Cuerpo:
+  ``` json
+  {
+    "id": 1,
+    "username": "un_nombre_de_usuario_editado"
+  }
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "id": 1,
+    "email": "un_email@un_dominio.com",
+    "username": "un_nombre_de_usuario_modificado",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-02-01T00:00:00Z"
+  }
+  ```
+
+* Crear un tweet:
+  ```
+  POST /api/v1/tweet
+  ```
+  Cuerpo:
+  ``` json
+  {
+    "user_id": 1,
+    "text": "el_texto_de_un_tweet"
+  }
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "id": 1,
+    "user_id": 1,
+    "text": "el_texto_de_un_tweet",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  }
+  ```
+
+* Obtener un tweet por ID:
+  ```
+  GET /api/v1/tweet/:id
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "id": 1,
+    "user_id": 1,
+    "text": "el_texto_de_un_tweet",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z"
+  }
+  ```
+
+* Modificar un tweet por ID:
+  ```
+  PUT /api/tweet/:id
+  ```
+  Cuerpo:
+  ``` json
+  {
+    "id": 1,
+    "user_id": 1,
+    "text": "el_texto_de_un_tweet_modificado"
+  }
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "id": 1,
+    "user_id": 1,
+    "text": "el_texto_de_un_tweet_modificado",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-02-01T00:00:00Z"
+  }
+  ```
+
+* Crear un follower:
+  ```
+  POST /api/v1/follower
+  ```
+  Cuerpo:
+  ``` json
+  {
+    "follower_id": 1,
+    "followed_id": 2
+  }
+  ```
+  Respuesta exitosa:
+  ``` json
+  {
+    "follower_id": 1,
+    "followed_id": 2,
+    "created_at": "2025-01-01T00:00:00Z"
+  }
+  ```
+
+* Obtener el timeline del usuario logueado:
+  ```
+  GET /api/v1/timeline
+  ```
+  Respuesta exitosa:
+  ``` json
+  [
     {
-        "email": "an_email@a_domain.com",
-        "password": "12345"
-    }
-    ```
-    Successful response:
-    ``` json
-    {
+      "id": 1,
+      "user_id": 1,
+      "text": "el_texto_de_un_tweet",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "user": {
         "id": 1,
-        "email": "an_email@a_domain.com"
+        "email": "un_email@un_dominio.com",
+        "username": "un_nombre_de_usuario",
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"  
+      } 
     }
-    ```
-* Login: 
-    ```
-    POST /api/login
-    ```
-    Body:
-    ``` json
-    {
-        "email": "an_email@a_domain.com",
-        "password": "12345"
-    }
-    ```
-    Successful response:
-    ``` json
-    {
-        "token": "a_JWT_token_to_be_sent_in_further_requests"
-    }
-    ```
+  ]
+  ```
 
-#### Authenticated Endpoints
+#### Respuesta errónea
 
-`Authorization: Bearer {token_received_at_login}` header must be sent in order to access the following endpoints.
-
-* Get all users:
-    ```
-    GET /api/user
-    ```
-    Successful response:
-    ``` json
-    [
-        {
-            "id": 1,
-            "email": "an_email@a_domain.com"
-        }
-    ]
-    ```
-
-* Get a specific user:
-    ```
-    GET /api/user/:id
-    ```
-    Successful response:
-    ``` json
-    {
-        "id": 1,
-        "email": "an_email@a_domain.com"
-    }
-    ```
-
-* Get all teams:
-    ```
-    GET /api/team
-    ```
-    Successful response:
-    ``` json
-    [
-        {
-            "id": 1,
-            "user_id": 1,
-            "country_id": 1,
-            "name": "a_team_name",
-            "value": 20000000,
-            "budget": 5000000
-        }
-    ]
-    ```
-
-* Get logged-in user's team:
-    ```
-    GET /api/my-team
-    ```
-  Successful response:
-    ``` json
-    {
-        "id": 1,
-        "user_id": 1,
-        "country_id": 1,
-        "name": "a_team_name",
-        "value": 20000000,
-        "budget": 5000000
-    }
-    ```
-
-* Get a specific team:
-    ```
-    GET /api/team/:id
-    ```
-  Successful response:
-    ``` json
-    {
-        "id": 1,
-        "user_id": 1,
-        "country_id": 1,
-        "name": "a_team_name",
-        "value": 20000000,
-        "budget": 5000000
-    }
-    ```
-
-* Get team's players:
-    ```
-    GET /api/team/:id/players
-    ```
-  Successful response:
-    ``` json
-    [
-        {
-            "id": 1,
-            "team_id": 1,
-            "country_id": 1,
-            "first_name": "a_player_first_name",
-            "last_name": "a_player_last_name",
-            "age": 20,
-            "position": "DEFENDER",
-            "value": 1000000
-        }
-    ]
-    ```
-
-* Modify a team: (only the owner can do this)
-    ```
-    PUT /api/team/:id
-    ```
-    Body:
-    ``` json
-    {
-        "country_id": 2,
-        "name": "another_team_name"
-    }
-    ```
-  Successful response:
-    ``` json
-    {
-        "id": 1,
-        "user_id": 1,
-        "country_id": 2,
-        "name": "another_team_name",
-        "value": 20000000,
-        "budget": 5000000
-    }
-    ```
-
-* Get all players:
-    ```
-    GET /api/player
-    ```
-  Successful response:
-    ``` json
-    [
-        {
-            "id": 1,
-            "team_id": 1,
-            "country_id": 1,
-            "first_name": "a_player_first_name",
-            "last_name": "a_player_last_name",
-            "age": 20,
-            "position": "DEFENDER",
-            "value": 1000000
-        }
-    ]
-    ```
-
-* Get a specific player:
-    ```
-    GET /api/player/:id
-    ```
-  Successful response:
-    ``` json
-    {
-        "id": 1,
-        "team_id": 1,
-        "country_id": 1,
-        "first_name": "a_player_first_name",
-        "last_name": "a_player_last_name",
-        "age": 20,
-        "position": "DEFENDER",
-        "value": 1000000
-    }
-    ```
-
-* Modify a player: (only the owner can do this)
-    ```
-    PUT /api/player/:id
-    ```
-    Body:
-    ``` json
-    {
-        "country_id": 2,
-        "first_name": "another_player_first_name",
-        "last_name": "another_player_last_name"
-    }
-    ```
-  Successful response:
-    ``` json
-    {
-        "id": 1,
-        "team_id": 1,
-        "country_id": 2,
-        "first_name": "another_player_first_name",
-        "last_name": "another_player_last_name",
-        "age": 20,
-        "position": "DEFENDER",
-        "value": 1000000
-    }
-    ```
-
-* Get all countries:
-    ```
-    GET /api/country
-    ```
-  Successful response:
-    ``` json
-    [
-        {
-            "id": 1,
-            "name": "ARGENTINA"
-        }
-    ]
-    ```
-
-* Get a specific country:
-    ```
-    GET /api/country/:id
-    ```
-  Successful response:
-    ``` json
-    {
-        "id": 1,
-        "name": "ARGENTINA"
-    }
-    ```
-
-* Get all available transfers:
-    ```
-    GET /api/transfer
-    ```
-  Successful response:
-    ``` json
-    [
-        {
-            "player_id": 1,
-            "value": 2500000
-        }
-    ]
-    ```
-
-* Get a specific available transfer:
-    ```
-    GET /api/transfer/:playerID
-    ```
-  Successful response:
-    ``` json
-    {
-        "player_id": 1,
-        "value": 2500000
-    }
-    ```
-
-* Create a transfer: (only the player owner can do this)
-    ```
-    POST /api/transfer
-    ```
-    Body:
-    ``` json
-    {
-        "player_id": 1,
-        "value": 2500000
-    }
-    ```
-  Successful response:
-    ``` json
-    {
-        "player_id": 1,
-        "value": 2500000
-    }
-    ```
-
-* Delete a transfer: (only the player owner can do this)
-    ```
-    DELETE /api/transfer/:playerID
-    ```
-  Successful response:
-    ``` json
-    {}
-    ```
-
-* Buy a transferable player:
-    ```
-    POST /api/transfer/:playerID/buy
-    ```
-  Successful response:
-    ``` json
-    {}
-    ```
-
-#### Response Codes
-
-* `200` for successful `GET`, `PUT` and `DELETE` requests
-* `201` for successful `POST` request
-* `400` for unsuccessful requests when the client sends incorrect data
-* `401` for unsuccessful requests when the client should be authenticated and is not
-* `403` for unsuccessful requests when the client is not authorized to do what is trying to do
-* `404` for unsuccessful requests when the requested entity is not found
-* `500` for unsuccessful requests when the system fails because of himself 
-
-#### Error Response
-
-When then request is unsuccessful, the server answers with the following format: 
+Cuando la solicitud no es exitosa, el servidor responde con el siguiente formato:
 
 ``` json
-    {
-        "code": 400,
-        "message": "a_description_of_what_happened"
-    }
+{
+  "code": 400,
+  "message": "una_descripcion_del_error"
+}
 ```
 
-## Further Improvements
+#### Códigos de respuesta
 
-* Add unit tests for the controllers, services and repositories
-* Add docker configuration for simpler set up of the develop enviroment
-* Get the configs present at `internal/configs` from environment variables
-* Add query params to the `GET` endpoints to allow better searches, pagination and related entities serialization options
+* `200` para solicitudes `GET`, `PUT` y `DELETE` exitosas
+* `201` para solicitudes `POST` exitosas
+* `400` para solicitudes fallidas cuando el cliente envía datos incorrectos
+* `401` para solicitudes fallidas cuando el cliente debería estar autenticado y no lo está
+* `403` para solicitudes fallidas cuando el cliente no está autorizado para realizar la acción
+* `404` para solicitudes fallidas cuando la entidad solicitada no se encuentra
+* `500` para solicitudes fallidas cuando el sistema falla por sí mismo

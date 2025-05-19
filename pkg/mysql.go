@@ -6,7 +6,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
-	"twitter-uala/internal/config"
+	"twitter-demo/internal/config"
 )
 
 type DB interface {

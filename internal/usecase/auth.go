@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"twitter-uala/internal/infraestructure/repository"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/infraestructure/repository"
+	"twitter-demo/pkg"
 )
 
 type IAuth interface {

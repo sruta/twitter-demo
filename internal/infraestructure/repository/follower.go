@@ -3,8 +3,8 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"twitter-uala/internal/domain"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/domain"
+	"twitter-demo/pkg"
 )
 
 type IFollower interface {

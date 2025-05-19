@@ -2,7 +2,7 @@ package dto
 
 import (
 	"time"
-	"twitter-uala/internal/domain"
+	"twitter-demo/internal/domain"
 )
 
 type UserCreate struct {

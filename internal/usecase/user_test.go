@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
-	"twitter-uala/internal/domain"
-	"twitter-uala/internal/infraestructure/repository"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/domain"
+	"twitter-demo/internal/infraestructure/repository"
+	"twitter-demo/pkg"
 )
 
 func TestUser_Search_Success(t *testing.T) {

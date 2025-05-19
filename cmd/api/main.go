@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"twitter-uala/internal"
-	"twitter-uala/internal/middleware"
+	"twitter-demo/internal"
+	"twitter-demo/internal/middleware"
 )
 
 func initRouter(c *internal.Container) *gin.Engine {

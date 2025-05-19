@@ -11,10 +11,10 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
-	"twitter-uala/internal/domain"
-	"twitter-uala/internal/infraestructure/repository"
-	"twitter-uala/internal/usecase"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/domain"
+	"twitter-demo/internal/infraestructure/repository"
+	"twitter-demo/internal/usecase"
+	"twitter-demo/pkg"
 )
 
 func TestUser_CreateUser_Success(t *testing.T) {

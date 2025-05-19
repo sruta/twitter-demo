@@ -6,9 +6,9 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"twitter-uala/internal/interfaces/dto"
-	"twitter-uala/internal/usecase"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/interfaces/dto"
+	"twitter-demo/internal/usecase"
+	"twitter-demo/pkg"
 )
 
 type ITweet interface {

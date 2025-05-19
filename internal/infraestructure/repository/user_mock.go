@@ -2,8 +2,8 @@ package repository
 
 import (
 	"github.com/stretchr/testify/mock"
-	"twitter-uala/internal/domain"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/domain"
+	"twitter-demo/pkg"
 )
 
 type UserMock struct {

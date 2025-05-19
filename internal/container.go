@@ -2,11 +2,11 @@ package internal
 
 import (
 	"fmt"
-	"twitter-uala/internal/config"
-	"twitter-uala/internal/infraestructure/repository"
-	"twitter-uala/internal/interfaces/controller"
-	"twitter-uala/internal/usecase"
-	"twitter-uala/pkg"
+	"twitter-demo/internal/config"
+	"twitter-demo/internal/infraestructure/repository"
+	"twitter-demo/internal/interfaces/controller"
+	"twitter-demo/internal/usecase"
+	"twitter-demo/pkg"
 )
 
 type Container struct {

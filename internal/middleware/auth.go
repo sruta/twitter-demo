@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"strings"
-	"twitter-uala/pkg"
+	"twitter-demo/pkg"
 )
 
 func Auth() gin.HandlerFunc {
