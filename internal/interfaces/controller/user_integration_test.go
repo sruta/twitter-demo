@@ -55,10 +55,7 @@ func TestUser_CreateUser_Success(t *testing.T) {
 	router.ServeHTTP(resp, req)
 
 	var created map[string]interface{}
-	err := json.Unmarshal(resp.Body.Bytes(), &created)
-	if err != nil {
-		return
-	}
+	json.Unmarshal(resp.Body.Bytes(), &created)
 
 	assert.Equal(t, http.StatusCreated, resp.Code)
 	assert.Equal(t, created["id"], float64(inputUser.ID))
