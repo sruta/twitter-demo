@@ -107,11 +107,11 @@ El test end-to-end realiza las siguientes solicitudes mientras va validando los 
 
 ### Modelo de datos
 
-![img.png](docs/data_model.png)
+![data_model.png](docs/data_model.png)
 
 ### Arquitectura actual
 
-![img.png](docs/actual_architecture.png)
+![actual_architecture.png](docs/actual_architecture.png)
 
 ### Arquitectura escalable
 
@@ -122,7 +122,7 @@ según la necesidad. El siguiente enfoque separa el sistema según los distintos
 - Lecturas de timelines
 - Búsquedas de tweets/usuarios/tags
 
-![img.png](docs/scalable_architecture.png)
+![scalable_architecture.png](docs/scalable_architecture.png)
 
 #### Componentes
 
